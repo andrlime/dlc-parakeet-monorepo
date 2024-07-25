@@ -1,0 +1,22 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  init:
+    cmds:
+      - bun install
+  build-dev:
+    cmds:
+      - docker build -t dlc/web -f docker/DevDockerfile .
+  run-dev:
+    cmds:
+      - task: build-dev
+      - docker run --rm -p 7700:7700 --name dlc-web-frontend dlc/web
+  build-prod:
+    cmds:
+      - docker build -t dlc/web -f docker/ProdDockerfile .
+  run-prod:
+    cmds:
+      - task: build-prod
+      - docker run --rm -p 7700:7700 --name dlc-web-frontend dlc/web

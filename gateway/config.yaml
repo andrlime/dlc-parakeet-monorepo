@@ -1,0 +1,7 @@
+mode: "DEV" # DEV, PROD
+db:
+  db_name: dlc
+  db_host: localhost
+  db_port: 8989
+app:
+  app_port: 9000

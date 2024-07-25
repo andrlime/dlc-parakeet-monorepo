@@ -1,0 +1,48 @@
+services:
+
+  web:
+    image: dlc/web
+    build:
+      context: web
+      dockerfile: docker/DevDockerfile
+      # dockerfile: docker/ProdDockerfile
+    develop:
+      watch:
+        - action: sync
+          path: web/
+          target: /web/
+          ignore:
+            - node_modules/
+            - package.json
+        - action: rebuild
+          path: web/package.json
+    ports:
+      - "7700:7700"
+    networks:
+      - web-gateway
+    restart: always
+
+  gateway:
+    image: dlc/gateway
+    build:
+      context: gateway
+      dockerfile: docker/DevDockerfile
+      # dockerfile: docker/ProdDockerfile
+    develop:
+      watch:
+        - action: sync
+          path: gateway/gateway
+          target: /gateway/gateway
+        - action: rebuild
+          path: web/pyproject.toml
+    ports:
+      - "9000:9000"
+    stop_signal: SIGINT
+    networks:
+      - web-gateway
+      - gateway-db
+    restart: always
+
+networks:
+  web-gateway:
+  gateway-db:

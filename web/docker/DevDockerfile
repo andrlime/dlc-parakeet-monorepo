@@ -1,0 +1,21 @@
+FROM node:22-bookworm AS base
+
+ARG MODE
+
+# Install poetry and dependencies
+FROM base AS deps
+
+WORKDIR /web
+
+COPY package.json ./
+RUN npm install
+
+# Run the website in dev mode
+FROM deps AS nextjs
+WORKDIR /web
+
+COPY --from=deps /web/. .
+COPY . .
+
+EXPOSE 7700:7700
+CMD ["npm", "run", "dev"]

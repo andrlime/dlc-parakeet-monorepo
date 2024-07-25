@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: "3"
+
+dotenv: [".env"]
+
+tasks:
+  init:
+    cmds:
+      - poetry install
+  lint:
+    cmds:
+      - poetry run pylint --rcfile pylintrc .
+  format:
+    cmds:
+      - poetry run black --line-length 120 .
+  prod:
+    cmds:
+      - poetry run waitress-serve --port=$PARAKEET__PORT --call gateway.flask.factory:create_flask_app
+  build-dev:
+    cmds:
+      - docker build -t dlc/gateway -f docker/DevDockerfile .
+  run-dev:
+    cmds:
+      - task: build-dev
+      - docker run --rm -p 9000:9000 --name dlc-api-gateway dlc/gateway
+  build-prod:
+    cmds:
+      - docker build -t dlc/gateway -f docker/ProdDockerfile .
+  run-prod:
+    cmds:
+      - task: build-prod
+      - docker run --rm -p 9000:9000 --name dlc-api-gateway dlc/gateway

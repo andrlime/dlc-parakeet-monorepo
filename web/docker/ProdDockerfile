@@ -1,0 +1,29 @@
+FROM node:22-bookworm AS base
+
+ARG MODE
+
+# Install poetry and dependencies
+FROM base AS deps
+
+WORKDIR /web
+
+COPY package.json ./
+RUN npm install
+
+# Build the website
+FROM deps AS builder
+WORKDIR /web
+
+COPY --from=deps /web/. .
+COPY . .
+
+RUN npm run build
+
+# Run the actual website
+FROM builder AS vite
+WORKDIR /web
+
+COPY --from=builder /web/. .
+
+EXPOSE 7700:7700
+CMD ["npm", "run", "start"]
